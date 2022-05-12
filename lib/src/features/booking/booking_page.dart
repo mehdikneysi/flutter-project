@@ -1,84 +1,96 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_movie_app/auth/globals.dart' as globals;
 import 'package:flutter_movie_app/src/core/constants/app_colors.dart';
 import 'package:flutter_movie_app/src/core/data/models/data.dart';
 import 'package:flutter_movie_app/src/core/data/models/parking.dart';
 import 'package:flutter_movie_app/src/features/booking/animations/buttom_size_animation.dart';
 import 'package:flutter_movie_app/src/features/booking/animations/opacity_animation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 import '../../core/data/models/parking_location.dart';
 import '../../core/data/models/section_spot.dart';
 import '../../core/data/models/spot.dart';
 import 'widgets/widgets.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_movie_app/auth/globals.dart' as globals;
-import 'package:fluttertoast/fluttertoast.dart';
 
-import 'package:firebase_core/firebase_core.dart';
 class BookingPage extends StatefulWidget {
   const BookingPage({Key? key}) : super(key: key);
 
   @override
   State<BookingPage> createState() => _BookingPageState();
 }
-getSpots()async {
-  await FirebaseFirestore.instance.collection("SpotSections").get().then((value) {
+
+getSpots() async {
+  await FirebaseFirestore.instance
+      .collection("SpotSections")
+      .get()
+      .then((value) {
     List A = value.docs[0].get("A");
     print(A);
     return A;
   });
 }
+
 reserver() async {
-  var uid='GNmpacY1hQOMqwV6Lksq';
+  var uid = 'GNmpacY1hQOMqwV6Lksq';
   var A;
-  await FirebaseFirestore.instance.collection("SpotSections").get().then((value) {
+  await FirebaseFirestore.instance
+      .collection("SpotSections")
+      .get()
+      .then((value) {
     A = value.docs[0].get("A");
-    print(A);});
-  if (A.length<2){
-  var B=A+A.length.toString();
-  await FirebaseFirestore.instance.collection("SpotSections").doc(uid).set(
-      {'A':B});
-  }
-  else toaster();
+    print(A);
+  });
+  if (A.length < 2) {
+    var B = A + A.length.toString();
+    await FirebaseFirestore.instance
+        .collection("SpotSections")
+        .doc(uid)
+        .set({'A': B});
+  } else
+    toaster();
 }
+
 annuler() async {
-  var uid='GNmpacY1hQOMqwV6Lksq';
+  var uid = 'GNmpacY1hQOMqwV6Lksq';
   var A;
-  await FirebaseFirestore.instance.collection("SpotSections").get().then((value) {
+  await FirebaseFirestore.instance
+      .collection("SpotSections")
+      .get()
+      .then((value) {
     A = value.docs[0].get("A");
-    print(A);});
-  var   B = A.substring(0, A.length - 1); // Hello
-  await FirebaseFirestore.instance.collection("SpotSections").doc(uid).set(
-      {'A':B});
-
+    print(A);
+  });
+  var B = A.substring(0, A.length - 1); // Hello
+  await FirebaseFirestore.instance
+      .collection("SpotSections")
+      .doc(uid)
+      .set({'A': B});
 }
-
-
 
 //var A;
- toaster(){
-Fluttertoast.showToast(
-msg: "Parking is reserved",
-toastLength: Toast.LENGTH_SHORT,
-gravity: ToastGravity.CENTER,
-timeInSecForIosWeb: 1,
-backgroundColor: Colors.red,
-textColor: Colors.white,
-fontSize: 16.0
-);
+toaster() {
+  Fluttertoast.showToast(
+      msg: "Parking is reserved",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0);
 }
+
 class _BookingPageState extends State<BookingPage>
     with TickerProviderStateMixin {
   late ButtomSizeAnimationController controller;
 
   final parking = parkings.first;
 
-
-
-
-
   @override
   void initState() {
     //A=getSpots();
-    print("********************************************************************************************");
+    print(
+        "********************************************************************************************");
     print(globals.isLoggedIn);
     controller = ButtomSizeAnimationController(
       contentController: AnimationController(
@@ -134,7 +146,10 @@ class _BookingPageState extends State<BookingPage>
                   children: [
                     OpacityAnimation(
                       animation: controller.inicialOpacityAnimation,
-                      child: _ParkingLayout(h: h, w: w, ),
+                      child: _ParkingLayout(
+                        h: h,
+                        w: w,
+                      ),
                     ),
                     OpacityAnimation(
                       animation: controller.endOpatictyAnimation,
@@ -199,7 +214,6 @@ class _ScaleButton extends StatelessWidget {
 }
 
 class _ParkingLayout extends StatefulWidget {
-
   const _ParkingLayout({
     Key? key,
     required this.h,
@@ -211,34 +225,41 @@ class _ParkingLayout extends StatefulWidget {
   final double h;
   final double w;
 
-
   @override
   State<_ParkingLayout> createState() => _ParkingLayoutState();
 }
-final  List<dynamic> H =[0,1,2,3];
+
+final List<dynamic> H = [0, 1, 2, 3];
 
 class _ParkingLayoutState extends State<_ParkingLayout> {
   var A;
 
-  Future<String> getSpots() async => await FirebaseFirestore.instance.collection("SpotSections").get().then((value) {
-       A = value.docs[0].get("A");
-      return A;
-    });
+  Future<String> getSpots() async => await FirebaseFirestore.instance
+          .collection("SpotSections")
+          .get()
+          .then((value) {
+        A = value.docs[0].get("A");
+        return A;
+      });
   List<Location> parkingLocation = [
     Location(
       name: "A1",
       ailes: 9,
       sections: [
-        SpotSection( spots:List.generate(24,
-              (index) => Spot(
+        SpotSection(
+            spots: List.generate(
+          24,
+          (index) => Spot(
             isBusy: H.contains(index),
-                isSelected: H.contains(index),
-                isHidden: [].contains(index),
+            isSelected: H.contains(index),
+            isHidden: [].contains(index),
           ),
         )),
-          //  SpotSection( spots: spotsB),
-        SpotSection( spots: List.generate(12,
-              (index) => Spot(
+        //  SpotSection( spots: spotsB),
+        SpotSection(
+            spots: List.generate(
+          12,
+          (index) => Spot(
             isBusy: H.contains(index),
             isHidden: [].contains(index),
           ),
@@ -248,112 +269,178 @@ class _ParkingLayoutState extends State<_ParkingLayout> {
   ];
   @override
   Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: Theme.of(context).textTheme.headline2!,
-      textAlign: TextAlign.center,
-      child: FutureBuilder<String>(
-        future: getSpots(), // a previously-obtained Future<String> or null
-        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-          List<Widget> children;
-          if (snapshot.hasData) {
-            children = <Widget>[
-              const Icon(
-                Icons.check_circle_outline,
-                color: Colors.green,
-                size: 60,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Text('Result: ${snapshot.data}'),
-              )
-            ];
-          } else if (snapshot.hasError) {
-            children = <Widget>[
-              const Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 60,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Text('Error: ${snapshot.error}'),
-              )
-            ];
-          } else {
-            children = const <Widget>[
-              SizedBox(
-                width: 60,
-                height: 60,
-                child: CircularProgressIndicator(),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 16),
-                child: Text('Awaiting result...'),
-              )
-            ];
-          }
-          return Padding(
-            padding:
-            const EdgeInsets.only(top: kToolbarHeight * 1.6, right: 25, left: 25),
-            child: Column(
-              children: [
-                SizedBox(
-                  height: widget.h * 0.06,
-                  width: widget.w,
-                  child: CustomPaint(
-                    painter: ScreenPainter(),
-                  ),
-                ),
-                SizedBox(height: widget.h * 0.03),
-                SizedBox(
-                  width: widget.w,
-                  child: ParkingCinema(
-                    cinema:  Location(
-                      name: "A1",
-                      ailes: 9,
-                      sections: [
-                        SpotSection( spots:List.generate(8,
-                              (index) => Spot(
-                            isBusy: H.contains(index),
-                            isSelected: H.contains(index),
-                            isHidden: [].contains(index),
-                          ),
-                        )),
-                        SpotSection( spots:List.generate(2,
-                              (index) => Spot(
-                            isBusy: A.split('').map(int.parse).toList().contains(index),
-                            isSelected: [0,1].contains(index),
-                            isHidden: [].contains(index),
-                          ),
-                        )),
-                        //  SpotSection( spots: spotsB),
-                        /*SpotSection( spots: List.generate(12,
-                              (index) => Spot(
-                            isBusy: H.contains(index),
-                            isHidden: [].contains(index),
-                          ),
-                        )),*/
-                      ],
-                    )
-                    ,
-                  ),
-                ),
-                SizedBox(height: widget.h * 0.02),
-                const ParkingSpotlabels(),
-                SizedBox(height: widget.h * 0.03),
-              ],
+    return FutureBuilder<String>(
+      future: getSpots(), // a previously-obtained Future<String> or null
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        List<Widget> children;
+        if (snapshot.hasData) {
+          children = <Widget>[
+            const Icon(
+              Icons.check_circle_outline,
+              color: Colors.green,
+              size: 60,
             ),
-          );
-
-        },
-      ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Text('Result: ${snapshot.data}'),
+            )
+          ];
+        } else if (snapshot.hasError) {
+          children = <Widget>[
+            const Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 60,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Text('Error: ${snapshot.error}'),
+            )
+          ];
+        } else {
+          children = const <Widget>[
+            SizedBox(
+              width: 60,
+              height: 60,
+              child: CircularProgressIndicator(),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: Text('Awaiting result...'),
+            )
+          ];
+        }
+        return Column(
+          children: [
+            SizedBox(
+              height: widget.h * 0.06,
+              width: widget.w,
+              child: CustomPaint(
+                painter: ScreenPainter(),
+              ),
+            ),
+            SizedBox(height: widget.h * 0.03),
+            StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection("places")
+                    .orderBy("index")
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Padding(
+                      padding: EdgeInsets.only(left: widget.w * 0.05),
+                      child: Container(
+                        height: widget.h * 0.15,
+                        child: Row(
+                          children: [
+                            Container(
+                              child: Container(
+                                width: widget.w * 0.5,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      height: widget.h * 0.06,
+                                      child: ListView.builder(
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: 4,
+                                          itemBuilder: (context, index) {
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                    color: snapshot
+                                                            .data!.docs[index]
+                                                            .get("status")
+                                                        ? Colors.grey
+                                                        : Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5)),
+                                                height: widget.h * 0.025,
+                                                width: widget.w * 0.08,
+                                              ),
+                                            );
+                                          }),
+                                    ),
+                                    Container(
+                                      height: widget.h * 0.06,
+                                      child: ListView.builder(
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: 4,
+                                          itemBuilder: (context, index2) {
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                    color: snapshot.data!
+                                                            .docs[index2 + 4]
+                                                            .get("status")
+                                                        ? Colors.grey
+                                                        : Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5)),
+                                                height: widget.h * 0.037,
+                                                width: widget.w * 0.08,
+                                              ),
+                                            );
+                                          }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Container(
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                      height: widget.h * 0.037,
+                                      width: widget.w * 0.08,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: AppColors.principalColor,
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                      height: widget.h * 0.037,
+                                      width: widget.w * 0.08,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  } else {
+                    return Container();
+                  }
+                }),
+            SizedBox(height: widget.h * 0.02),
+            const ParkingSpotlabels(),
+            SizedBox(height: widget.h * 0.03),
+          ],
+        );
+      },
     );
   }
 }
 
-
-  //final Location location;
- /* @override
+//final Location location;
+/* @override
   Widget build(BuildContext context) {
       return Padding(
       padding:
@@ -382,8 +469,6 @@ class _ParkingLayoutState extends State<_ParkingLayout> {
     );
 
   }*/
-
-
 
 class _ButtomPage extends StatelessWidget {
   const _ButtomPage({
@@ -426,67 +511,70 @@ class _ButtomPage extends StatelessWidget {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(
-                  right: 25, left: 25, top: 30, bottom: 17),
+                  right: 25, left: 25, top: 10, bottom: 17),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: const [
-                      Text(
-                        'Total Price',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        '5DT',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 26,
-                        ),
-                      )
-                    ],
-                  ),
-                if (globals.isLoggedIn) ... [ // These children are only visible if condition is true
-
-              GestureDetector(
-                    onTap: () { print("Container was tapped");reserver();
-                    Navigator.pop(context);
-                    },
-                    child: Container(
-                      child: const Center(
-                        child: Text(
-                          'Book Ticket',
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: const [
+                        Text(
+                          'Total Price',
                           style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
+                            color: Colors.grey,
                             fontWeight: FontWeight.bold,
+                            fontSize: 15,
                           ),
                         ),
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.principalColor,
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      // height: h * 0.08,
-                      width: 150,
-                    )
-                  ),
-                  FloatingActionButton(
-                    onPressed : () { annuler();
-                      Navigator.pop(context);},
-                    backgroundColor: Colors.red,
-                    tooltip: 'Annuler La reservation',
-                    child: new Icon(Icons.remove),
-                  ), // This tr
-                ],
-    ]
-              ),
+                        SizedBox(height: 10),
+                        Text(
+                          '5DT',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 26,
+                          ),
+                        )
+                      ],
+                    ),
+                    if (globals.isLoggedIn) ...[
+                      // These children are only visible if condition is true
+
+                      GestureDetector(
+                          onTap: () {
+                            print("Container was tapped");
+                            reserver();
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            child: const Center(
+                              child: Text(
+                                'Book Ticket',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.principalColor,
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            // height: h * 0.08,
+                            width: 150,
+                          )),
+                      FloatingActionButton(
+                        onPressed: () {
+                          annuler();
+                          Navigator.pop(context);
+                        },
+                        backgroundColor: Colors.red,
+                        tooltip: 'Annuler La reservation',
+                        child: new Icon(Icons.remove),
+                      ), // This tr
+                    ],
+                  ]),
             ),
           )
         ],
